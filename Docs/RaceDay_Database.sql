@@ -30,3 +30,15 @@ CREATE TABLE Organiser (
     CONSTRAINT FK_Organiser_User
     FOREIGN KEY (UserID) REFERENCES Users(UserID)
 );
+
+
+-- PARTICIPANT TABLE
+CREATE TABLE Participant (
+    ParticipantID INT IDENTITY(1,1) PRIMARY KEY,
+    UserID INT NOT NULL,
+    PhoneNumber VARCHAR(20) NOT NULL,
+    DateOfBirth DATE NOT NULL,
+
+    CONSTRAINT FK_Participant_User
+    FOREIGN KEY (UserID) REFERENCES Users(UserID)
+);
