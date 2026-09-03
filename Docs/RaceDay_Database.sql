@@ -49,3 +49,21 @@ CREATE TABLE Category (
     CategoryName VARCHAR(50) NOT NULL UNIQUE,
     DistanceKM DECIMAL(5,2) NOT NULL
 );
+
+- EVENT TABLE
+CREATE TABLE Event (
+    EventID INT IDENTITY(1,1) PRIMARY KEY,
+    OrganiserID INT NOT NULL,
+    CategoryID INT NOT NULL,
+    EventName VARCHAR(100) NOT NULL,
+    EventDate DATE NOT NULL,
+    Location VARCHAR(100) NOT NULL,
+    RouteInformation VARCHAR(255),
+    WeatherInformation VARCHAR(255),
+
+    CONSTRAINT FK_Event_Organiser
+    FOREIGN KEY (OrganiserID) REFERENCES Organiser(OrganiserID),
+
+    CONSTRAINT FK_Event_Category
+    FOREIGN KEY (CategoryID) REFERENCES Category(CategoryID)
+);
