@@ -154,3 +154,20 @@ VALUES
 (2,2,'2026-08-10','Registered'),
 
 (1,3,'2026-08-15','Registered');
+
+-- RESULTS
+INSERT INTO Result
+(EnrollmentID, FinishTime, Position)
+VALUES
+(1,'00:28:45',12),
+(2,'00:55:30',25);
+
+
+-- TEST DATA
+SELECT * FROM Users;
+SELECT * FROM Organiser;
+SELECT * FROM Participant;
+SELECT * FROM Category;
+SELECT * FROM Event;
+SELECT * FROM Enrollment;
+SELECT * FROM Result;
