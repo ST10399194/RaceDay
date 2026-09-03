@@ -1,8 +1,1 @@
 ##RaceDay Event Management System
-
-
-
-
-
-
-
