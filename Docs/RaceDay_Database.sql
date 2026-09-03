@@ -19,3 +19,14 @@ CREATE TABLE Users (
     PasswordHash VARCHAR(255) NOT NULL,
     Role VARCHAR(20) NOT NULL DEFAULT 'Participant'
 );
+
+ ORGANISER TABLE
+CREATE TABLE Organiser (
+    OrganiserID INT IDENTITY(1,1) PRIMARY KEY,
+    UserID INT NOT NULL,
+    OrganisationName VARCHAR(100) NOT NULL,
+    ContactNumber VARCHAR(20) NOT NULL UNIQUE,
+
+    CONSTRAINT FK_Organiser_User
+    FOREIGN KEY (UserID) REFERENCES Users(UserID)
+);
