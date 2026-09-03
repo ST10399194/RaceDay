@@ -1,8 +1,8 @@
 name: Part 1 Documentation Check
 
 on:
-  push:
-  pull_request:
+ push:
+ pull_request:
 
 jobs:
   validate-part1:
