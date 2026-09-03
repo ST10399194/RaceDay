@@ -67,3 +67,21 @@ CREATE TABLE Event (
     CONSTRAINT FK_Event_Category
     FOREIGN KEY (CategoryID) REFERENCES Category(CategoryID)
 );
+
+
+-- ENROLLMENT TABLE
+CREATE TABLE Enrollment (
+    EnrollmentID INT IDENTITY(1,1) PRIMARY KEY,
+    ParticipantID INT NOT NULL,
+    EventID INT NOT NULL,
+    RegistrationDate DATE NOT NULL DEFAULT GETDATE(),
+    Status VARCHAR(30) NOT NULL DEFAULT 'Registered',
+
+    CONSTRAINT FK_Enrollment_Participant
+    FOREIGN KEY (ParticipantID) REFERENCES Participant(ParticipantID),
+
+    CONSTRAINT FK_Enrollment_Event
+    FOREIGN KEY (EventID) REFERENCES Event(EventID)
+);
+
+
