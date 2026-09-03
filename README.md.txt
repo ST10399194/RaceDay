@@ -1,1 +1,1 @@
-##RaceDay PROJECT
+##RaceDay Event Management System
