@@ -145,3 +145,12 @@ VALUES
 'Pretoria CBD','Highway route','Warm');
 
 
+-- ENROLLMENTS
+INSERT INTO Enrollment
+(ParticipantID, EventID, RegistrationDate, Status)
+VALUES
+(1,1,'2026-08-01','Registered'),
+
+(2,2,'2026-08-10','Registered'),
+
+(1,3,'2026-08-15','Registered');
