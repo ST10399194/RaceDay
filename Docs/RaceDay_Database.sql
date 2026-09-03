@@ -84,4 +84,14 @@ CREATE TABLE Enrollment (
     FOREIGN KEY (EventID) REFERENCES Event(EventID)
 );
 
+ RESULT TABLE
+CREATE TABLE Result (
+    ResultID INT IDENTITY(1,1) PRIMARY KEY,
+    EnrollmentID INT NOT NULL,
+    FinishTime TIME NOT NULL,
+    Position INT NOT NULL,
+
+    CONSTRAINT FK_Result_Enrollment
+    FOREIGN KEY (EnrollmentID) REFERENCES Enrollment(EnrollmentID)
+);
 
