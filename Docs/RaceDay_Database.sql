@@ -121,3 +121,27 @@ VALUES
 (3,'0721112222','2002-05-15'),
 (4,'0733334444','2001-09-20');
 
+
+-- CATEGORIES
+INSERT INTO Category
+(CategoryName, DistanceKM)
+VALUES
+('5KM Fun Run',5),
+('10KM Race',10),
+('Half Marathon',21.1);
+
+
+-- EVENTS
+INSERT INTO Event
+(OrganiserID, CategoryID, EventName, EventDate, Location, RouteInformation, WeatherInformation)
+VALUES
+(1,1,'Pretoria Spring Run','2026-09-05',
+'Pretoria West','City route','Sunny'),
+
+(1,2,'Gauteng 10K Challenge','2026-10-10',
+'Centurion','Park route','Cloudy'),
+
+(2,3,'Capital Half Marathon','2026-11-15',
+'Pretoria CBD','Highway route','Warm');
+
+
