@@ -42,3 +42,10 @@ CREATE TABLE Participant (
     CONSTRAINT FK_Participant_User
     FOREIGN KEY (UserID) REFERENCES Users(UserID)
 );
+
+- CATEGORY TABLE
+CREATE TABLE Category (
+    CategoryID INT IDENTITY(1,1) PRIMARY KEY,
+    CategoryName VARCHAR(50) NOT NULL UNIQUE,
+    DistanceKM DECIMAL(5,2) NOT NULL
+);
