@@ -95,3 +95,29 @@ CREATE TABLE Result (
     FOREIGN KEY (EnrollmentID) REFERENCES Enrollment(EnrollmentID)
 );
 
+-- SAMPLE DATA INSERTS
+-- USERS
+INSERT INTO Users 
+(FirstName, LastName, Email, PasswordHash, Role)
+VALUES
+('Thabo','Mokoena','thabo@raceday.co.za','hash123','Organiser'),
+('Lerato','Nkosi','lerato@raceday.co.za','hash456','Organiser'),
+('Kabelo','Dube','kabelo@email.com','hash789','Participant'),
+('Amahle','Mthembu','amahle@email.com','hash321','Participant');
+
+
+-- ORGANISERS
+INSERT INTO Organiser
+(UserID, OrganisationName, ContactNumber)
+VALUES
+(1,'Pretoria Marathon Club','0123456789'),
+(2,'Run Gauteng Events','0119876543');
+
+
+-- PARTICIPANTS
+INSERT INTO Participant
+(UserID, PhoneNumber, DateOfBirth)
+VALUES
+(3,'0721112222','2002-05-15'),
+(4,'0733334444','2001-09-20');
+
