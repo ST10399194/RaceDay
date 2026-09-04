@@ -122,4 +122,4 @@ A successful workflow run is displayed by GitHub with a green check mark, confir
 ## Video Demonstration
 A video demonstration of the RaceDay Event Management System is available on YouTube.
 
-- **YouTube Link**:
+- **YouTube Link**: https://youtu.be/Ode4nzog4Kw 
