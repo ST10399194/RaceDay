@@ -12,52 +12,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Show repository files
-        run: |
-          echo "Repository files:"
-          find . -maxdepth 3 -type f | sort
-
       - name: Check docs folder
-        run: |
-          if [ -d "docs" ]; then
-            echo "✓ docs folder exists"
-          else
-            echo "✗ docs folder is missing"
-            exit 1
-          fi
+        run: test -d docs
 
       - name: Check ERD
-        run: |
-          if [ -f "docs/RaceDay_ERD.pdf" ]; then
-            echo "✓ RaceDay_ERD.pdf found"
-          else
-            echo "✗ RaceDay_ERD.pdf is missing"
-            exit 1
-          fi
+        run: test -f docs/RaceDay_ERD.pdf
 
       - name: Check API Endpoint Plan
-        run: |
-          if [ -f "docs/RaceDay_API_Endpoint_Plan.pdf" ]; then
-            echo "✓ RaceDay_API_Endpoint_Plan.pdf found"
-          else
-            echo "✗ RaceDay_API_Endpoint_Plan.pdf is missing"
-            exit 1
-          fi
+        run: test -f docs/RaceDay_API_Endpoint_Plan.pdf
 
       - name: Check SQL Script
-        run: |
-          if [ -f "docs/RaceDay_Database.sql" ]; then
-            echo "✓ RaceDay_Database.sql found"
-          else
-            echo "✗ RaceDay_Database.sql is missing"
-            exit 1
-          fi
+        run: test -f docs/RaceDay_Database.sql
 
       - name: Check README
-        run: |
-          if [ -f "README.md" ]; then
-            echo "✓ README.md found"
-          else
-            echo "✗ README.md is missing"
-            exit 1
-          fi
+        run: test -f README.md
