@@ -64,7 +64,7 @@ Part 1 focuses on system design, architectural planning, data modeling, and sett
 │   └── RaceDay_Schema.sql     # Complete SQL Server Database Schema & Seed Script
 ├── .gitignore                 # Environment and build artifact ignores
 └── README.md                  # Main project documentation and guide
-
+```
 ---
 
 ## Database Setup
@@ -93,7 +93,7 @@ Part 1 focuses on system design, architectural planning, data modeling, and sett
 - The SQL script contains all required database tables, primary keys, foreign keys, constraints, and sample data for testing the RaceDay system.
 
 ---
-##CI/CD
+## CI/CD
 - RaceDay uses GitHub Actions to automate Continuous Integration and Continuous Delivery (CI/CD). The workflow configuration is located at:
 
 `.github/workflows/part1-ci.yml`
