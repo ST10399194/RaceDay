@@ -1,28 +1,28 @@
 name: Part 1 Documentation Check
 
 on:
-  push:
-  pull_request:
+  push:
+  pull_request:
 
 jobs:
-  validate-part1:
-    runs-on: ubuntu-latest
+  validate-part1:
+    runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Check docs folder
-        run: test -d docs
+      - name: Check docs folder
+        run: test -d docs
 
-      - name: Check ERD
-        run: test -f docs/RaceDay_ERD.pdf
+      - name: Check ERD
+        run: test -f docs/RaceDay_ERD.pdf
 
-      - name: Check API Endpoint Plan
-        run: test -f docs/RaceDay_API_Endpoint_Plan.pdf
+      - name: Check API Endpoint Plan
+        run: test -f docs/RaceDay_API_Endpoint_Plan.pdf
 
-      - name: Check SQL Script
-        run: test -f docs/RaceDay_Database.sql
+      - name: Check SQL Script
+        run: test -f docs/RaceDay_Database.sql
 
-      - name: Check README
-        run: test -f README.md
+      - name: Check README
+        run: test -f README.md
