@@ -33,11 +33,11 @@ Participants are general users (runners, cyclists, walkers) who engage with even
 Part 1 focuses on system design, architectural planning, data modeling, and setting up repository CI/CD automation.
 
 ### ERD (Entity Relationship Diagram)
-- **File**: Located at `/docs/ERD.png` (or `/docs/ERD.pdf`)
-- **Overview**: The ERD models 6 primary entities (`Users`, `Roles`, `Events`, `EventCategories`, `Enrolments`, and `Results`). It explicitly details Primary Keys (PK), Foreign Keys (FK), field constraints, and relationship cardinalities (1:N, M:N via bridge tables).
+- **File**: Located at `/docs/RaceDay_ERDpdf`
+- **Overview**: The ERD models 6 primary entities (`Users`, `Roles`, `Events`, `EventCategories`, `Enrolments`, and `Results`). It explicitly details Primary Keys (PK), Foreign Keys (FK), field constraints, and relationship cardinalities (1:1, 1:1..* via bridge tables).
 
 ### API Endpoint Plan
-- **File**: Located at `/docs/API_Endpoint_Plan.pdf` (or `/docs/API_Endpoint_Plan.md`)
+- **File**: Located at `/docs/RaceDay_API_Endpoint_Plan.pdf` 
 - **Overview**: A comprehensive REST API specification matrix outlining HTTP Methods (`GET`, `POST`, `PUT`, `DELETE`), URL routes (`/api/...`), required roles (`Public`, `Participant`, `Organiser`), Request Body parameters, and Expected Response HTTP Status Codes for:
   - Authentication (`/api/auth/register`, `/api/auth/login`)
   - User Profiles (`/api/users/profile`)
@@ -47,7 +47,7 @@ Part 1 focuses on system design, architectural planning, data modeling, and sett
   - Results & Performance (`/api/results`, `/api/events/{id}/results`)
 
 ### SQL Database Script
-- **File**: Located at `/docs/RaceDay_Schema.sql`
+- **File**: Located at `/docs/RaceDay_Database.sql`
 - **Overview**: A complete T-SQL database creation script compatible with Microsoft SQL Server Management Studio (SSMS). Contains `CREATE TABLE` DDL statements with constraints (`NOT NULL`, `UNIQUE`, `DEFAULT`, `CHECK`, `PRIMARY KEY`, `FOREIGN KEY`), followed by `INSERT` DML statements seeding sample data (2 Organisers, 2 Participants, 3 Events, Categories, and Enrolments).
 
 ---
@@ -65,18 +65,22 @@ Part 1 focuses on system design, architectural planning, data modeling, and sett
 ├── .gitignore                 # Environment and build artifact ignores
 └── README.md                  # Main project documentation and guide
 
-##Database Setup
-RaceDay uses Microsoft SQL Server as its database. The database schema and sample data are provided in:
+---
 
-/docs/RaceDay_Schema.sql
+## Database Setup
 
-#Running the Database Script in SSMS: 
-Open SQL Server Management Studio (SSMS).
+- RaceDay uses Microsoft SQL Server as its database. The database schema and sample data are provided in:
 
-Connect to your SQL Server instance (e.g., localhost or (localdb)\MSSQLLocalDB)
-Select File → Open → File.
+`/docs/RaceDay_Database.sql`
 
-Navigate to the project's docs folder.
+## Running the Database Script in SSMS: 
+1. Open SQL Server Management Studio (SSMS).
+
+2. Connect to your SQL Server instance (e.g., localhost )
+
+3. Select File → Open → File.
+
+4. Navigate to the project's docs folder.
 
 5. Open RaceDay_Schema.sql.
 
@@ -86,4 +90,36 @@ Navigate to the project's docs folder.
 
 8. Verify that the RaceDay tables and sample data have been created successfully.
 
-The SQL script contains all required database tables, primary keys, foreign keys, constraints, and sample data for testing the RaceDay system.
+- The SQL script contains all required database tables, primary keys, foreign keys, constraints, and sample data for testing the RaceDay system.
+
+---
+##CI/CD
+- RaceDay uses GitHub Actions to automate Continuous Integration and Continuous Delivery (CI/CD). The workflow configuration is located at:
+
+`.github/workflows/part1-ci.yml`
+
+- The GitHub Actions workflow automatically runs when changes are pushed to the repository. It checks that the project builds successfully and that configured validation/testing steps complete without errors.
+
+- **The workflow helps ensure that**:
+Dependencies restore successfully.
+
+The application builds without errors.
+
+Automated tests and validation checks pass.
+
+Commits do not introduce build failures.
+
+The project remains in a deployable state.
+
+A successful workflow run is displayed by GitHub with a green check mark, confirming all steps passed.
+
+
+
+- **Successful GitHub Actions Build **: ![Alt Text Description](/docs/ci-build-screenshot.png)
+
+---
+
+## Video Demonstration
+A video demonstration of the RaceDay Event Management System is available on YouTube.
+
+- **YouTube Link**:
