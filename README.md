@@ -115,7 +115,7 @@ A successful workflow run is displayed by GitHub with a green check mark, confir
 
 
 
-- **Successful GitHub Actions Build **: ![Alt Text Description](/docs/ci-build-screenshot.png)
+- **Successful GitHub Actions Build**: ![Alt Text Description](/docs/ci-build-screenshot.png)
 
 ---
 
