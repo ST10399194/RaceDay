@@ -12,6 +12,8 @@ public class RoleAuthorizationTests : IClassFixture<WebApplicationFactory<Progra
     public RoleAuthorizationTests(WebApplicationFactory<Program> factory)
     {
         _factory = factory;
+
+        TestDatabaseSeeder.SeedMockData(_factory);
     }
 
     [Fact]
