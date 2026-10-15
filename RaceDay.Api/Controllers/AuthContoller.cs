@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using RaceDay.Api.Data;
 using RaceDay.Api.Models;
 using RaceDay.Contracts;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using static RaceDay.Contracts.Dtos;
@@ -10,36 +13,38 @@ using static RaceDay.Contracts.Dtos;
 namespace RaceDay.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/auth")] // Mapped precisely to /api/auth blueprint path
 public class AuthController : ControllerBase
 {
     private readonly RaceDayDbContext _context;
+    private readonly IConfiguration _configuration;
 
-    public AuthController(RaceDayDbContext context)
+    public AuthController(RaceDayDbContext context, IConfiguration configuration)
     {
         _context = context;
+        _configuration = configuration;
     }
 
-    // === REGISTRATION FLOW ===
+    // === 1. POST /api/auth/register ===
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        // 1. Validate request and check if email already exists
+        // Check whether the email address already exists
         if (await _context.Users.AnyAsync(u => u.Email == request.Email))
         {
-            return BadRequest("A user with this email already exists.");
+            return BadRequest(new { Message = "A user with this email address already exists." });
         }
 
-        // Validate Role input
+        // Confirm the selected role is valid
         if (request.Role != "Participant" && request.Role != "Organiser")
         {
-            return BadRequest("Role must be either 'Participant' or 'Organiser'.");
+            return BadRequest(new { Message = "Invalid role selection. Must be 'Participant' or 'Organiser'." });
         }
 
-        // 2. Securely hash the password (never store raw text strings!)
+        // Hash the password securely
         string hashedPassword = HashPassword(request.Password);
 
-        // 3. Save User details to SQL Server
+        // Save the user
         var newUser = new User
         {
             FirstName = request.FirstName,
@@ -52,7 +57,7 @@ public class AuthController : ControllerBase
         _context.Users.Add(newUser);
         await _context.SaveChangesAsync();
 
-        // Automatically create the dependent profile structure based on the chosen role
+        // Dynamically instantiate dependent profile structural components
         if (request.Role == "Participant")
         {
             _context.Participants.Add(new Participant { UserID = newUser.UserID });
@@ -63,39 +68,66 @@ public class AuthController : ControllerBase
         }
         await _context.SaveChangesAsync();
 
-        return Ok(new { Message = "Registration successful!" });
+        return Ok(new { Message = "User registration successfully completed." });
     }
 
-    // === LOGIN & SESSION MANAGEMENT FLOW ===
+    // === 2. POST /api/auth/login ===
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        // 1. Fetch user by email
+        // Find the user using the supplied email
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
         if (user == null)
         {
-            return Unauthorized("Invalid email or password.");
+            return Unauthorized(new { Message = "Invalid email credentials or password matching failure." });
         }
 
-        // 2. Hash incoming password and compare to saved hash
+        // Verify the supplied password against the stored hash
         string incomingHash = HashPassword(request.Password);
         if (user.PasswordHash != incomingHash)
         {
-            return Unauthorized("Invalid email or password.");
+            return Unauthorized(new { Message = "Invalid email credentials or password matching failure." });
         }
 
-        // 3. Return a simulated token response tracking the session profile info
-        // (Tracks UserId and Role required by Step 14 layout)
-        var response = new AuthResponse
+        // Create the session / Store UserId and Role inside token claims payload
+        var claims = new[]
+    {
+      new Claim(ClaimTypes.NameIdentifier, user.UserID.ToString()),
+      new Claim(ClaimTypes.Email, user.Email),
+      new Claim(ClaimTypes.Role, user.Role)
+    };
+
+        var keySecret = _configuration["JwtSettings:Secret"] ?? "SuperSecretDefaultTestingKeyChangeThisInProduction123!";
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keySecret));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var tokenOptions = new JwtSecurityToken(
+          issuer: _configuration["JwtSettings:Issuer"] ?? "RaceDayApi",
+          audience: _configuration["JwtSettings:Audience"] ?? "RaceDayApp",
+          claims: claims,
+          expires: DateTime.UtcNow.AddHours(4),
+          signingCredentials: creds
+        );
+
+        var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+
+        // Return useful authenticated-user information
+        return Ok(new AuthResponse
         {
             Email = user.Email,
-            Token = $"SIMULATED_JWT_TOKEN_FOR_USER_{user.UserID}_ROLE_{user.Role}"
-        };
-
-        return Ok(response);
+            Token = tokenString
+        });
     }
 
-    // === PASSWORD HASHING HELPER ===
+    // === 3. POST /api/auth/logout ===
+    [HttpPost("logout")]
+    public IActionResult Logout()
+    {
+        // Instructs client terminal environments to purge local storage session arrays
+        return Ok(new { Message = "Session successfully cleared. Protected functionality is no longer accessible." });
+    }
+
+    // Cryptographic security hash generation helper method
     private static string HashPassword(string password)
     {
         using var sha256 = SHA256.Create();
