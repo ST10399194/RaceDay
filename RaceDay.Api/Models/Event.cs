@@ -19,6 +19,8 @@ namespace RaceDay.Api.Models
         [Required]
         public string EventName { get; set; } = string.Empty;
 
+        public string Description { get;set; } = string.Empty;
+
         public DateTime EventDate { get; set; }
         public string Location { get; set; } = string.Empty;
         public string RouteInformation { get; set; } = string.Empty;

@@ -79,6 +79,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+public partial class Program { } // For integration testing
 
 app.UseAuthentication();
 
