@@ -16,8 +16,7 @@ builder.Services.AddDbContext<RaceDayDbContext>(options =>
 var keySecret = builder.Configuration["JwtSettings:Secret"] ?? "SuperSecretDefaultTestingKeyChangeThisInProduction123!";
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme = 
-    JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(options =>
