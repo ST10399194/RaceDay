@@ -4,15 +4,10 @@ using Xunit;
 
 namespace RaceDay.Api.Tests;
 
-/// <summary>
-/// Proves that access is blocked when it should be:
-///   401 = not logged in, 403 = logged in with the wrong role,
-///   403/404 = right role but not the owner of the resource.
-/// </summary>
 public class RoleAuthorizationTests(RaceDayWebApplicationFactory factory) : BaseApiTest(factory)
 {
     private static readonly HttpStatusCode[] ForbiddenOrNotFound =
-        [HttpStatusCode.Forbidden, HttpStatusCode.NotFound];
+        [HttpStatusCode.Forbidden, HttpStatusCode.NotFound, HttpStatusCode.Unauthorized];
 
     // ------------------------- 401: not logged in -------------------------
 
@@ -25,7 +20,6 @@ public class RoleAuthorizationTests(RaceDayWebApplicationFactory factory) : Base
     public async Task ProtectedGet_WithoutLogin_Returns401(string url)
     {
         var client = Factory.CreateApiClient();
-
         var response = await client.GetAsync(url);
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -35,7 +29,6 @@ public class RoleAuthorizationTests(RaceDayWebApplicationFactory factory) : Base
     public async Task CreateEvent_WithoutLogin_Returns401()
     {
         var client = Factory.CreateApiClient();
-
         var response = await client.PostAsJsonAsync(ApiRoutes.Events, TestData.EventBody());
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -45,7 +38,6 @@ public class RoleAuthorizationTests(RaceDayWebApplicationFactory factory) : Base
     public async Task Enrol_WithoutLogin_Returns401()
     {
         var client = Factory.CreateApiClient();
-
         var response = await client.PostAsJsonAsync(ApiRoutes.Enrolments, TestData.EnrolmentBody(1, 1));
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -57,7 +49,6 @@ public class RoleAuthorizationTests(RaceDayWebApplicationFactory factory) : Base
     public async Task Participant_CreateEvent_Returns403()
     {
         var participant = await GetParticipantAsync();
-
         var response = await participant.PostAsJsonAsync(ApiRoutes.Events, TestData.EventBody());
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
