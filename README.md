@@ -118,7 +118,7 @@ To establish or refresh your storage tables from scratch inside Visual Studio 20
 
 ---
 
-## 🔒 Authentication & API Endpoints (Swagger Specifications)
+##  Authentication & API Endpoints (Swagger Specifications)
 
 The backend enforces server-managed authentication profiles via session mappings. Route layers utilize `[Authorize(Roles = "...")]` parameters to prevent authorization bypass attempts.
 
