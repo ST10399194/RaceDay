@@ -167,3 +167,7 @@ public async Task Participant_CreatesEvent_Returns403Forbidden()
 ##  Continuous Integration & Continuous Delivery (CI/CD)
 
 The platform runs systematic building pipelines powered via **GitHub Actions** on every codebase update event. The automated script is located inside **`.github/workflows/main.yml`**.
+
+
+## Youtube Link
+https://youtu.be/gdYgwsuQP-A
