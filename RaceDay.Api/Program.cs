@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddScoped<BlobStorageService>();
 // Add services to the container.
 
 builder.Services.AddControllers();
