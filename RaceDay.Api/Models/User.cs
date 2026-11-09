@@ -26,5 +26,7 @@ namespace RaceDay.Api.Models
         // Navigation Properties for 1-to-1 relationships
         public Participant? Participant { get; set; }
         public Organiser? Organiser { get; set; }
+
+        public string? ProfileImageUrl { get; set; } // Optional profile image URL
     }
 }

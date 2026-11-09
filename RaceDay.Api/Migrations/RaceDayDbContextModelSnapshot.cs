@@ -80,8 +80,15 @@ namespace RaceDay.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EventID"));
 
+                    b.Property<string>("BannerImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("CategoryID")
                         .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("EventDate")
                         .HasColumnType("datetime2");
@@ -215,6 +222,9 @@ namespace RaceDay.Api.Migrations
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProfileImageUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Role")

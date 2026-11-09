@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using RaceDay.Contracts;
+﻿
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using RaceDay.Mvc.Services;
-using System;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
+using System;
+using System.IO;
 using System.Threading.Tasks;
 using static RaceDay.Contracts.Dtos;
 
@@ -19,38 +22,55 @@ public class ParticipantController : Controller
         _api = api;
     }
 
-    private bool IsLoggedIn() => HttpContext.Session.GetInt32("UserId").HasValue;
-
-    private bool IsParticipant() =>
-        string.Equals(HttpContext.Session.GetString("Role"), "Participant",
-            StringComparison.OrdinalIgnoreCase);
-
-    //  Upcoming events page with filtering
-    public async Task<IActionResult> Index(string? type, string? search)
+    // Check whether the user is logged in as a Participant.
+    private bool IsParticipant()
     {
-        if (!IsParticipant()) return RedirectToAction("Login", "Auth");
+        return HttpContext.Session.GetInt32("UserId").HasValue &&
+               string.Equals(
+                   HttpContext.Session.GetString("Role"),
+                   "Participant",
+                   StringComparison.OrdinalIgnoreCase);
+    }
 
-        var response = await _api.SendAsync(HttpMethod.Get, "api/events");
-        var events = await _api.ReadAsync<List<EventDto>>(response) ?? new();
+    // Display upcoming events.
+    public async Task<IActionResult> Index(string? search)
+    {
+        if (!IsParticipant())
+            return RedirectToAction("Login", "Auth");
 
-        events = events.Where(e => e.EventDate >= DateTime.Today).ToList();
+        var response = await _api.SendAsync(
+            HttpMethod.Get, "api/events");
 
-        if (!string.IsNullOrWhiteSpace(type))
-            events = events.Where(e => e.EventType == type).ToList();
+        if (!response.IsSuccessStatusCode)
+            return View(new List<EventDto>());
 
+        var events = await _api.ReadAsync<List<EventDto>>(response)
+                     ?? new List<EventDto>();
+
+        // Show only upcoming events.
+        events = events
+            .Where(e => e.Date >= DateTime.Today)
+            .ToList();
+
+        // Search by event name.
         if (!string.IsNullOrWhiteSpace(search))
-            events = events.Where(e =>
-                e.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                e.Location.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+        {
+            events = events
+                .Where(e => e.Name.Contains(
+                    search, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
 
         return View(events);
     }
 
-    // Event details and category selection
+    // Enter an event.
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> EnterEvent(int eventId, int categoryId)
     {
-        if (!IsParticipant()) return RedirectToAction("Login", "Auth");
+        if (!IsParticipant())
+            return RedirectToAction("Login", "Auth");
 
         var request = new CreateEnrolmentRequest
         {
@@ -58,91 +78,140 @@ public class ParticipantController : Controller
             CategoryId = categoryId
         };
 
-        var response = await _api.SendAsync(HttpMethod.Post, "api/enrolments", request);
+        var response = await _api.SendAsync(
+            HttpMethod.Post, "api/enrolments", request);
 
         if (!response.IsSuccessStatusCode)
         {
-            TempData["Error"] = await response.Content.ReadAsStringAsync();
-            return RedirectToAction("Details", "Events", new { id = eventId });
+            TempData["Error"] =
+                await response.Content.ReadAsStringAsync();
+
+            return RedirectToAction("Details", "Events",
+                new { id = eventId });
         }
 
-        TempData["Success"] = "You have entered the event successfully.";
+        TempData["Success"] =
+            "You have entered the event successfully.";
+
         return RedirectToAction(nameof(MyEvents));
     }
 
-    // My Events
+    // Display the Participant's enrolled events.
     public async Task<IActionResult> MyEvents()
     {
-        if (!IsParticipant()) return RedirectToAction("Login", "Auth");
+        if (!IsParticipant())
+            return RedirectToAction("Login", "Auth");
 
-        // Calls the participant enrolment endpoint from Part 2 API
-        var response = await _api.SendAsync(HttpMethod.Get, "api/enrolments/mine");
-        var myEnrolments = await _api.ReadAsync<List<EnrolmentDto>>(response) ?? new();
+        var response = await _api.SendAsync(
+            HttpMethod.Get, "api/enrolments/mine");
 
-        return View(myEnrolments);
+        if (!response.IsSuccessStatusCode)
+            return View(new List<EnrolmentDto>());
+
+        var enrolments =
+            await _api.ReadAsync<List<EnrolmentDto>>(response)
+            ?? new List<EnrolmentDto>();
+
+        return View(enrolments);
     }
 
-    //  My Results
+    // Display the Participant's results.
     public async Task<IActionResult> MyResults()
     {
-        if (!IsParticipant()) return RedirectToAction("Login", "Auth");
+        if (!IsParticipant())
+            return RedirectToAction("Login", "Auth");
 
-        // Queries the participant's official logged history from Part 2 API
-        var response = await _api.SendAsync(HttpMethod.Get, "api/results/mine");
-        var myResults = await _api.ReadAsync<List<ResultDto>>(response) ?? new();
+        var response = await _api.SendAsync(
+            HttpMethod.Get, "api/results/mine");
 
-        return View(myResults);
+        if (!response.IsSuccessStatusCode)
+            return View(new List<ResultDto>());
+
+        var results =
+            await _api.ReadAsync<List<ResultDto>>(response)
+            ?? new List<ResultDto>();
+
+        return View(results);
     }
 
-    // Profile - Display Form
+    // Display the Participant's profile.
     [HttpGet]
     public async Task<IActionResult> Profile()
     {
-        if (!IsParticipant()) return RedirectToAction("Login", "Auth");
+        if (!IsParticipant())
+            return RedirectToAction("Login", "Auth");
 
-        var response = await _api.SendAsync(HttpMethod.Get, "api/profile");
-        var profile = await _api.ReadAsync<ParticipantProfileDto>(response);
+        var response = await _api.SendAsync(
+            HttpMethod.Get, "api/profile/me");
 
-        if (profile == null) return NotFound("Profile not found.");
+        if (!response.IsSuccessStatusCode)
+            return NotFound("Profile could not be retrieved.");
+
+        var profile =
+            await _api.ReadAsync<ProfileDto>(response);
+
+        if (profile == null)
+            return NotFound("Profile not found.");
 
         return View(profile);
     }
 
-    // Profile - Handle Update & Image Upload to API
+    // Update the Participant's profile.
     [HttpPost]
-    public async Task<IActionResult> Profile(ParticipantProfileDto model, IFormFile? profilePicture)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Profile(
+        ProfileDto model,
+        IFormFile? profilePicture)
     {
-        if (!IsParticipant()) return RedirectToAction("Login", "Auth");
-        if (!ModelState.IsValid) return View(model);
+        if (!IsParticipant())
+            return RedirectToAction("Login", "Auth");
 
-        // If an image is selected, handle uploading multi-part form content to Part 2 API
+        if (!ModelState.IsValid)
+            return View(model);
+
+        // Upload a profile picture if one was selected.
         if (profilePicture != null && profilePicture.Length > 0)
         {
             using var content = new MultipartFormDataContent();
             using var stream = profilePicture.OpenReadStream();
             using var streamContent = new StreamContent(stream);
 
-            // Match the parameter expectation of  endpoint
-            content.Add(streamContent, "file", profilePicture.FileName);
+            content.Add(
+                streamContent,
+                "file",
+                Path.GetFileName(profilePicture.FileName));
 
-            var imgResponse = await _api.SendAsync(HttpMethod.Post, "api/profile/upload-image", content);
-            if (!imgResponse.IsSuccessStatusCode)
+            var imageResponse = await _api.SendAsync(
+                HttpMethod.Post,
+                "api/profile/upload-image",
+                content);
+
+            if (!imageResponse.IsSuccessStatusCode)
             {
-                ModelState.AddModelError("", "Failed to save profile picture to cloud storage.");
+                ModelState.AddModelError(
+                    "",
+                    "Failed to upload profile picture.");
+
                 return View(model);
             }
         }
 
-        // Persist standard profile field data shifts
-        var response = await _api.SendAsync(HttpMethod.Put, "api/profile", model);
+        // Save profile information.
+        var response = await _api.SendAsync(
+            HttpMethod.Put, "api/profile/me", model);
+
         if (!response.IsSuccessStatusCode)
         {
-            ModelState.AddModelError("", await response.Content.ReadAsStringAsync());
+            ModelState.AddModelError(
+                "",
+                await response.Content.ReadAsStringAsync());
+
             return View(model);
         }
 
         TempData["Success"] = "Profile updated successfully.";
+
         return RedirectToAction(nameof(Profile));
     }
-
 }
+

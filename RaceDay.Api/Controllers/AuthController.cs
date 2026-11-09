@@ -116,11 +116,14 @@ public class AuthController : ControllerBase
 
         var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
-        // Return useful authenticated-user information
-        return Ok(new AuthResponse
+        // Return useful authenticated-user information
+        return Ok(new AuthResponse
         {
+            Token =  tokenString,
+            UserId = user.UserID,
+            FirstName = user.FirstName,
             Email = user.Email,
-            Token = tokenString
+            Role = user.Role
         });
     }
 

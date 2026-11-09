@@ -28,5 +28,7 @@ namespace RaceDay.Api.Models
 
         // Navigation Properties (1-to-many)
         public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
+
+        public string? BannerImageUrl { get; set; }
     }
 }

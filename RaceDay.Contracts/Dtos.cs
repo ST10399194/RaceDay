@@ -26,9 +26,11 @@ namespace RaceDay.Contracts
         public class AuthResponse
         {
             public string Token { get; set; } = string.Empty;
+            public int UserId { get; set; }
+            public string FirstName { get; set; } = string.Empty;
             public string Email { get; set; } = string.Empty;
+            public string Role { get; set; } = string.Empty;
         }
-
         // --- PROFILE DTOs ---
 
         public class ProfileDto
@@ -51,6 +53,9 @@ namespace RaceDay.Contracts
             public string Name { get; set; } = string.Empty;
             public string Description { get; set; } = string.Empty;
             public DateTime Date { get; set; }
+            public string Location { get; set; } = string.Empty;
+            public double DistanceKm { get; set; }
+            public string EventType { get; set; } = string.Empty;
         }
 
         public class UpdateEventRequest
@@ -121,7 +126,7 @@ namespace RaceDay.Contracts
             public int Position { get; set; }
         }
 
-        // --- IMAGE UPLOAD DTO (Part 3) ---
+        // --- IMAGE UPLOAD DTO ---
 
         public class UploadResponse
         {
