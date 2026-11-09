@@ -275,10 +275,11 @@ public class EventsController : ControllerBase
         });
     }
 
-    
+
+
     // POST: api/events/{id}/banner
     // Only the event's Organiser can upload a banner.
-  
+    [ApiExplorerSettings(IgnoreApi = true)]
     [HttpPost("{id:int}/banner")]
     [Authorize(Roles = "Organiser")]
     public async Task<IActionResult> UploadBanner(

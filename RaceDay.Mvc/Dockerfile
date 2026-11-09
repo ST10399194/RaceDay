@@ -1,31 +1,37 @@
-# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-# This stage is used when running from VS in fast mode (Default for Debug configuration)
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+# Runtime image: smaller image used when the finished website runs.
+FROM ://microsoft.com AS base
 USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
-EXPOSE 8081
 
-
-# This stage is used to build the service project
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+# SDK image: contains compilers/tools required to restore and build the project.
+FROM ://microsoft.com AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+
+# Copy project files first so Docker can cache package restore layers.
 COPY ["RaceDay.Mvc/RaceDay.Mvc.csproj", "RaceDay.Mvc/"]
 COPY ["RaceDay.Contracts/RaceDay.Contracts.csproj", "RaceDay.Contracts/"]
-RUN dotnet restore "./RaceDay.Mvc/RaceDay.Mvc.csproj"
+
+# Run dotnet restore targeting the MVC application
+RUN dotnet restore "RaceDay.Mvc/RaceDay.Mvc.csproj"
+
+# Copy the rest of the application files across
 COPY . .
 WORKDIR "/src/RaceDay.Mvc"
-RUN dotnet build "./RaceDay.Mvc.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# This stage is used to publish the service project to be copied to the final stage
+# Build the project
+RUN dotnet build "RaceDay.Mvc.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+# Publish stage to optimize binaries for distribution
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./RaceDay.Mvc.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "RaceDay.Mvc.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
+# Final production stage mapping binaries into runtime image context
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "RaceDay.Mvc.dll"]
+
+dll"]
