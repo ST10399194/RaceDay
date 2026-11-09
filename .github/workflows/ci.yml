@@ -1,35 +1,44 @@
 
-name: RaceDay API CI/CD
+
+name: RaceDay CI
 
 on:
   push:
-    branches: [main, master]
+    branches:
+      - main
+      - master
+
   pull_request:
-    branches: [main, master]
+    branches:
+      - main
+      - master
+
+  workflow_dispatch:
 
 jobs:
   build-and-test:
+    name: Build and Test RaceDay
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Download the repository
-      - name: Checkout Repository
+      # Download the repository.
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Install .NET 8
-      - name: Setup .NET SDK
+      # Install .NET 8.
+      - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
-      # 3. Restore NuGet packages
-      - name: Restore Dependencies
+      # Restore NuGet packages.
+      - name: Restore dependencies
         run: dotnet restore RaceDay.sln
 
-      # 4. Build the solution
-      - name: Build Solution
+      # Build all projects in the solution.
+      - name: Build solution
         run: dotnet build RaceDay.sln --configuration Release --no-restore
 
-      # 5. Run automated xUnit tests
-      - name: Run xUnit Automation Tests
-        run: dotnet test RaceDay.sln --configuration Release --no-build --verbosity normal
+      # Run the API integration tests.
+      - name: Run API tests
+        run: dotnet test RaceDay.Api.Tests/RaceDay.Api.Tests.csproj --configuration Release --no-build --logger "console;verbosity=normal"
