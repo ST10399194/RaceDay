@@ -1,0 +1,46 @@
+﻿@model IEnumerable<RaceDay.Contracts.Dtos.EnrolmentDto>
+
+@{
+    ViewData["Title"] = "My Enrolments";
+}
+
+<div class="container mt-4">
+
+    <h1>My Registered Events</h1>
+
+    @if (Model == null || !Model.Any())
+    {
+        <p class="text-muted">You have not registered for any events yet.</p>
+    }
+    else
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Event Name</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.EventName</td>
+                        <td>
+                            <span class="badge
+                                        @(item.Status == "Confirmed"
+                                                                      ? "bg-success"
+                                                                      : item.Status == "Pending"
+                                                                          ? "bg-warning text-dark"
+                                                                          : "bg-secondary")">
+                        @item.Status
+                    </span>
+                </td>
+            </tr>
+                        }
+            </tbody>
+        </table>
+    }
+
+</div>

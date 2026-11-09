@@ -20,3 +20,19 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+/* Reusable status badge coloring rules for RaceDay system alignment */
+.status-confirmed {
+    background-color: #198754 ;
+    color: white ;
+}
+
+.status-pending {
+    background-color: #ffc107 ;
+    color: #222222 ;
+}
+
+.status-cancelled {
+    background-color: #dc3545 ;
+    color: white ;
+}
