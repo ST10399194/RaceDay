@@ -7,7 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\HomeController.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\RaceDay.Contracts\RaceDay.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\" />
+    <Folder Include="Views\Auth\" />
+    <Folder Include="Views\Events\" />
+    <Folder Include="Views\Participant\" />
+    <Folder Include="Views\Organiser\" />
   </ItemGroup>
 
 </Project>
