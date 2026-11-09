@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <Folder Include="Views\Auth\" />
-    <Folder Include="Views\Events\" />
     <Folder Include="Views\Participant\" />
   </ItemGroup>
 
