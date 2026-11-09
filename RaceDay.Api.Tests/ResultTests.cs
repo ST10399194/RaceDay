@@ -34,20 +34,25 @@ public class ResultTests(RaceDayWebApplicationFactory factory)
     }
 
     // CAPTURE RESULT TESTS
-
     [Fact]
     public async Task Organiser_CaptureResult_ReturnsSuccess()
     {
+        // Arrange
         var (organiser, _, _, enrolmentId) = await ArrangeAsync();
 
+        // Act
         var response = await CaptureResultAsync(organiser, enrolmentId);
 
+        // Read the API response for debugging.
+        var responseBody = await response.Content.ReadAsStringAsync();
+
+        // Assert
         Assert.True(
             response.StatusCode == HttpStatusCode.OK ||
             response.StatusCode == HttpStatusCode.Created,
-            $"Expected 200 or 201 but received {(int)response.StatusCode}");
+            $"Expected 200 or 201 but received {(int)response.StatusCode} " +
+            $"({response.StatusCode}). Response: {responseBody}");
     }
-
     [Fact]
     public async Task Organiser_CaptureResult_UnknownEnrolment_ReturnsNotFound()
     {

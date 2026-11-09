@@ -42,10 +42,11 @@ public static class TestData
     public static object EnrolmentBody(int eventId, int categoryId) =>
         new { eventId, categoryId };
 
+    // Creates the request body for capturing a participant's result.
     public static object ResultBody(int enrolmentId, int position = 1) => new
     {
         enrolmentId,
-        finishTime = "00:48:30",
+        timeTaken = "00:48:30",
         position
     };
 
