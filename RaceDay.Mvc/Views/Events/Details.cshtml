@@ -1,4 +1,48 @@
-﻿@if (!string.IsNullOrWhiteSpace(Model.BannerImageUrl))
-{
-    <img src="@Model.BannerImageUrl" alt="@Model.Name event banner" class="img-fluid rounded" />
+﻿@model RaceDay.Contracts.Dtos.EventDto
+
+@{
+    ViewData["Title"] = "Event Details";
 }
+
+<div class="container mt-4">
+
+    <h1 class="mb-4">@Model.Name</h1>
+
+    @if (!string.IsNullOrWhiteSpace(Model.BannerImageUrl))
+    {
+        <img src="@Model.BannerImageUrl"
+             alt="@Model.Name event banner"
+             class="img-fluid rounded mb-4"
+             style="max-height: 400px; width: 100%; object-fit: cover;" />
+    }
+    else
+    {
+        <p class="text-muted">No event banner has been uploaded yet.</p>
+    }
+
+    <div class="card p-4">
+        <h4>Event Information</h4>
+
+        <p>
+            <strong>Description:</strong>
+            @Model.Description
+        </p>
+
+        <p>
+            <strong>Date:</strong>
+            @Model.Date.ToString("dd MMMM yyyy")
+        </p>
+
+        <p>
+            <strong>Location:</strong>
+            @Model.Location
+        </p>
+    </div>
+
+    <a asp-controller="Home"
+       asp-action="Index"
+       class="btn btn-secondary mt-3">
+        Back
+    </a>
+
+</div>
