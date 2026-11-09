@@ -424,7 +424,7 @@ The presentation covers the system's main features and demonstrates how Organise
 
 **Watch the RaceDay project presentation:**
 
-[RaceDay Event Management System – Video Presentation](https://youtu.be/gdYgwsuQP-A)
+[RaceDay Event Management System – Video Presentation](https://youtu.be/TkaczqjlGLU)
 
 ## Project Deliverables
 
