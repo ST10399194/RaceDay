@@ -13,25 +13,20 @@ WORKDIR /src
 COPY ["RaceDay.Mvc/RaceDay.Mvc.csproj", "RaceDay.Mvc/"]
 COPY ["RaceDay.Contracts/RaceDay.Contracts.csproj", "RaceDay.Contracts/"]
 
-# Run dotnet restore targeting the MVC application
 RUN dotnet restore "RaceDay.Mvc/RaceDay.Mvc.csproj"
 
-# Copy the rest of the application files across
+# Copy the rest of the repository after restore.
 COPY . .
 WORKDIR "/src/RaceDay.Mvc"
-
-# Build the project
 RUN dotnet build "RaceDay.Mvc.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# Publish stage to optimize binaries for distribution
+# Publish the compiled MVC application.
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "RaceDay.Mvc.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-# Final production stage mapping binaries into runtime image context
+# Final runtime container.
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "RaceDay.Mvc.dll"]
-
-dll"]
