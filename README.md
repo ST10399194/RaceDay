@@ -412,7 +412,7 @@ This process helps identify application errors and security issues before code c
 
 The following screenshot provides evidence of the RaceDay GitHub Actions workflow execution.
 
-![RaceDay GitHub Actions Successful Workflow](docs/github-actions-success.png)
+![RaceDay GitHub Actions Successful Workflow](RaceDay\Docs\github-actions-success.png)   
 
 The screenshot should show the successful workflow run, including the solution build and automated test execution.
 
