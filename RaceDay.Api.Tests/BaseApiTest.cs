@@ -1,12 +1,23 @@
-﻿namespace RaceDay.Api.Tests;
+﻿
+namespace RaceDay.Api.Tests;
 
-public abstract class BaseApiTest(RaceDayWebApplicationFactory factory) : IClassFixture<RaceDayWebApplicationFactory>
+// Shared setup for all API test classes.
+public abstract class BaseApiTest(
+    RaceDayWebApplicationFactory factory)
+    : IClassFixture<RaceDayWebApplicationFactory>
 {
+    // Provides access to the test API.
     protected readonly RaceDayWebApplicationFactory Factory = factory;
 
-    protected Task<HttpClient> GetOrganiserAsync() =>
-        TestAuthHelper.CreateOrganiserClientAsync(Factory);
+    // Creates an authenticated Organiser client.
+    protected Task<HttpClient> GetOrganiserAsync()
+    {
+        return TestAuthHelper.CreateOrganiserClientAsync(Factory);
+    }
 
-    protected Task<HttpClient> GetParticipantAsync() =>
-        TestAuthHelper.CreateParticipantClientAsync(Factory);
+    // Creates an authenticated Participant client.
+    protected Task<HttpClient> GetParticipantAsync()
+    {
+        return TestAuthHelper.CreateParticipantClientAsync(Factory);
+    }
 }

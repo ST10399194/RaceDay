@@ -42,10 +42,13 @@ public class AuthenticationTests(RaceDayWebApplicationFactory factory) : BaseApi
     }
 
     [Fact]
+    
     public async Task Register_MissingEmail_ReturnsBadRequest()
     {
         var client = Factory.CreateApiClient();
-        var response = await TestAuthHelper.RegisterAsync(client, "", "Participant");
+
+        var response = await TestAuthHelper.RegisterAsync(
+            client, "", "Participant");
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -89,14 +92,16 @@ public class AuthenticationTests(RaceDayWebApplicationFactory factory) : BaseApi
         Assert.Contains(response.StatusCode, [HttpStatusCode.Unauthorized, HttpStatusCode.BadRequest]);
     }
 
+  
     [Fact]
-    public async Task Login_UnknownEmail_Fails()
+    public async Task Login_UnknownEmail_ReturnsUnauthorized()
     {
         var client = Factory.CreateApiClient();
-        var response = await TestAuthHelper.LoginAsync(client, TestData.UniqueEmail("ghost"));
 
-        Assert.Contains(response.StatusCode, [HttpStatusCode.BadRequest, HttpStatusCode.UnprocessableEntity]);
-        
+        var response = await TestAuthHelper.LoginAsync(
+            client, TestData.UniqueEmail("ghost"));
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
     [Fact]

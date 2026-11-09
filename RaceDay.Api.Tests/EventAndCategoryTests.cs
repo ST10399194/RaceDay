@@ -1,33 +1,43 @@
-﻿using System.Net;
+﻿
+using System.Net;
 using System.Net.Http.Json;
 using Xunit;
 
 namespace RaceDay.Api.Tests;
 
-public class EventAndCategoryTests(RaceDayWebApplicationFactory factory) : BaseApiTest(factory)
+public class EventAndCategoryTests(RaceDayWebApplicationFactory factory)
+    : BaseApiTest(factory)
 {
-    private static async Task<HttpResponseMessage> CreateEventRequestAsync(HttpClient organiser, string name = "Soweto 10K") =>
-        await organiser.PostAsJsonAsync(ApiRoutes.Events, TestData.EventBody(name));
+    // EVENT CREATION TESTS
 
     [Fact]
     public async Task Organiser_CreateEvent_ReturnsSuccess()
     {
         var organiser = await GetOrganiserAsync();
-        var response = await CreateEventRequestAsync(organiser);
 
-        bool isSuccess = response.StatusCode == HttpStatusCode.Created || response.StatusCode == HttpStatusCode.OK;
-        Assert.True(isSuccess, $"Expected 200 or 201, but returned {(int)response.StatusCode}");
+        var response = await organiser.PostAsJsonAsync(
+            ApiRoutes.Events,
+            TestData.EventBody("Soweto 10K"));
+
+        Assert.True(
+            response.StatusCode == HttpStatusCode.OK ||
+            response.StatusCode == HttpStatusCode.Created,
+            $"Expected 200 or 201 but received {(int)response.StatusCode}");
     }
 
     [Fact]
-    public async Task Organiser_CreateEvent_MissingName_Returns400()
+    public async Task Organiser_CreateEvent_MissingName_ReturnsBadRequest()
     {
         var organiser = await GetOrganiserAsync();
-        var response = await CreateEventRequestAsync(organiser, name: "");
 
-        Assert.Contains(response.StatusCode, [HttpStatusCode.BadRequest, HttpStatusCode.UnprocessableEntity]);
+        var response = await organiser.PostAsJsonAsync(
+            ApiRoutes.Events,
+            TestData.EventBody(""));
+
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
+
+    // VIEW EVENT TESTS
 
     [Theory]
     [InlineData("Organiser")]
@@ -37,7 +47,9 @@ public class EventAndCategoryTests(RaceDayWebApplicationFactory factory) : BaseA
         var organiser = await GetOrganiserAsync();
         await TestData.CreateEventAsync(organiser);
 
-        var client = await TestAuthHelper.CreateAuthenticatedClientAsync(Factory, role);
+        var client = await TestAuthHelper.CreateAuthenticatedClientAsync(
+            Factory, role);
+
         var response = await client.GetAsync(ApiRoutes.Events);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -50,16 +62,19 @@ public class EventAndCategoryTests(RaceDayWebApplicationFactory factory) : BaseA
         var eventId = await TestData.CreateEventAsync(organiser);
 
         var participant = await GetParticipantAsync();
+
         var response = await participant.GetAsync(ApiRoutes.Event(eventId));
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Fact]
-    public async Task GetEvent_UnknownId_Returns404()
+    public async Task GetEvent_UnknownId_ReturnsNotFound()
     {
         var participant = await GetParticipantAsync();
-        var response = await participant.GetAsync(ApiRoutes.Event(999999));
+
+        var response = await participant.GetAsync(
+            ApiRoutes.Event(999999));
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -75,55 +90,77 @@ public class EventAndCategoryTests(RaceDayWebApplicationFactory factory) : BaseA
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
+    // EVENT UPDATE AND DELETE TESTS
+
     [Fact]
-    public async Task Organiser_UpdateOwnEvent_Succeeds()
+    public async Task Organiser_UpdateOwnEvent_ReturnsSuccess()
     {
         var organiser = await GetOrganiserAsync();
         var eventId = await TestData.CreateEventAsync(organiser);
 
-        var response = await organiser.PutAsJsonAsync(ApiRoutes.Event(eventId), TestData.EventBody("Renamed 10K"));
+        var response = await organiser.PutAsJsonAsync(
+            ApiRoutes.Event(eventId),
+            TestData.EventBody("Renamed 10K"));
 
-        Assert.True(response.StatusCode is HttpStatusCode.OK or HttpStatusCode.NoContent,
-            $"Expected 200/204 but got {(int)response.StatusCode}");
+        Assert.True(
+            response.StatusCode == HttpStatusCode.OK ||
+            response.StatusCode == HttpStatusCode.NoContent,
+            $"Expected 200 or 204 but received {(int)response.StatusCode}");
     }
 
     [Fact]
-    public async Task Organiser_DeleteOwnEvent_ThenEventIsGone()
+    public async Task Organiser_DeleteOwnEvent_ReturnsSuccess()
     {
         var organiser = await GetOrganiserAsync();
         var eventId = await TestData.CreateEventAsync(organiser);
 
-        var delete = await organiser.DeleteAsync(ApiRoutes.Event(eventId));
-        Assert.True(delete.StatusCode is HttpStatusCode.OK or HttpStatusCode.NoContent,
-            $"Expected delete 200/204 but got {(int)delete.StatusCode}");
+        var deleteResponse = await organiser.DeleteAsync(
+            ApiRoutes.Event(eventId));
 
-        var get = await organiser.GetAsync(ApiRoutes.Event(eventId));
-        Assert.Equal(HttpStatusCode.NotFound, get.StatusCode);
+        Assert.True(
+            deleteResponse.StatusCode == HttpStatusCode.OK ||
+            deleteResponse.StatusCode == HttpStatusCode.NoContent,
+            $"Expected 200 or 204 but received {(int)deleteResponse.StatusCode}");
+
+        // Confirm that the deleted event can no longer be found.
+        var getResponse = await organiser.GetAsync(
+            ApiRoutes.Event(eventId));
+
+        Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
     }
 
+    // CATEGORY TESTS
+
     [Fact]
-    public async Task Organiser_CreateCategoryOnOwnEvent_ReturnsSuccess()
+    public async Task Organiser_CreateCategory_ReturnsSuccess()
     {
         var organiser = await GetOrganiserAsync();
         var eventId = await TestData.CreateEventAsync(organiser);
 
         var response = await organiser.PostAsJsonAsync(
-            ApiRoutes.EventCategories(eventId), TestData.CategoryBody("Under 20"));
+            ApiRoutes.EventCategories(eventId),
+            TestData.CategoryBody("Under 20"));
 
-        bool isSuccess = response.StatusCode == HttpStatusCode.Created || response.StatusCode == HttpStatusCode.OK;
-        Assert.True(isSuccess, $"Expected 200 or 201, but returned {(int)response.StatusCode}");
+        Assert.True(
+            response.StatusCode == HttpStatusCode.OK ||
+            response.StatusCode == HttpStatusCode.Created,
+            $"Expected 200 or 201 but received {(int)response.StatusCode}");
     }
 
     [Fact]
-    public async Task Participant_UpdateCategory_Returns403()
+    public async Task Participant_UpdateCategory_ReturnsForbidden()
     {
         var organiser = await GetOrganiserAsync();
         var eventId = await TestData.CreateEventAsync(organiser);
-        var categoryId = await TestData.CreateCategoryAsync(organiser, eventId);
+
+        var categoryId = await TestData.CreateCategoryAsync(
+            organiser, eventId);
 
         var participant = await GetParticipantAsync();
+
         var response = await participant.PutAsJsonAsync(
-            ApiRoutes.Category(categoryId), TestData.CategoryBody("Nope"));
+            ApiRoutes.Category(categoryId),
+            TestData.CategoryBody("Nope"));
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }

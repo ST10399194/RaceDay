@@ -29,6 +29,11 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
+        // Check that required registration details are provided.
+        if (string.IsNullOrWhiteSpace(request.Email))
+        {
+            return BadRequest("Email is required.");
+        }
         // Check whether the email address already exists
         if (await _context.Users.AnyAsync(u => u.Email == request.Email))
         {
