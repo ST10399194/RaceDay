@@ -1,0 +1,31 @@
+﻿@model RaceDay.Contracts.CreateEventRequest
+
+<h1>Create Event</h1>
+<form asp-action="CreateEvent" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <label asp-for="Name"></label>
+    <input asp-for="Name" class="form-control" />
+    <span asp-validation-for="Name" class="text-danger"></span>
+
+    <label asp-for="Description"></label>
+    <textarea asp-for="Description" class="form-control"></textarea>
+
+    <label asp-for="EventDate"></label>
+    <input asp-for="EventDate" type="date" class="form-control" />
+
+    <label asp-for="Location"></label>
+    <input asp-for="Location" class="form-control" />
+
+    <label asp-for="DistanceKm"></label>
+    <input asp-for="DistanceKm" class="form-control" />
+
+    <label asp-for="EventType"></label>
+    <select asp-for="EventType" class="form-select">
+        <option value="Run">Run</option>
+        <option value="Walk">Walk</option>
+        <option value="Cycle">Cycle</option>
+    </select>
+
+    <button class="btn btn-primary mt-3" type="submit">Create Event</button>
+</form>

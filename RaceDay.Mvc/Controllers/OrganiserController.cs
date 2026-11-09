@@ -64,4 +64,14 @@ public class OrganiserController : Controller
 
         return RedirectToAction(nameof(Events));
     }
+
+    public async Task<IActionResult> Categories(int eventId)
+    {
+        if (!IsOrganiser()) return RedirectToAction("Login", "Auth");
+
+        var response = await _api.SendAsync(HttpMethod.Get, $"api/events/{eventId}/categories");
+        var categories = await _api.ReadAsync<List<CategoryDto>>(response) ?? new();
+
+        return View(categories);
+    }
 }
